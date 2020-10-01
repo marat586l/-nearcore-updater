@@ -25,7 +25,7 @@ function update    {
   echo "Successful update  `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
   echo "Successful update  `date +"%Y-%m-%d--%H:%M"`" 
   nearup stop
-  sleep 4
+  sleep 2
   nearup run ${network} --binary-path ~/nearcore/target/release/
  else
   echo "Update is failed `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
@@ -53,7 +53,7 @@ function update    {
   eval $path 
 
 my_node=$(curl -s http://127.0.0.1:3030/status | jq .version | awk '{print $2}')   #My node version
-  my_node="1.16.0-beta.1"
+   ###my_node="1.16.0-beta.1"
 case ${my_node%,*} in         #choose my network
   
   *"$rc"*)
