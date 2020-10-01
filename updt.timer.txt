@@ -1,0 +1,31 @@
+1.
+sudo nano /etc/systemd/system/updt.service
+Move this text there:
+[Unit]
+Description=Update Node for the last version on GH
+ 
+[Service]
+ExecStart=/home/$USER/.near/script/updt.bh
+
+2.
+sudo nano /etc/systemd/system/updt.timer
+Move this text there:
+Unit]
+Description=timer for updt.bh script 
+ 
+[Timer]
+OnCalendar=01:50
+ 
+[Install]
+WantedBy=timers.target
+
+In this case script will start every day at 01:50 AM. it may changed.
+
+3.
+sudo systemctl daemon-reload
+sudo systemctl enable updt.timer
+sudo systemctl start updt.timer
+4.
+logs are may to see in journalctl: 
+journalctl -S today -f -u updt.service
+This are logs for today for example
