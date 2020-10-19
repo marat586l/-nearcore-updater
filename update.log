@@ -1,0 +1,27 @@
+Needs update the current node 2020-10-10--16:56
+Update started at 2020-10-10--16:56
+Needs update the current node 2020-10-10--16:59
+Update started at 2020-10-10--16:59
+Needs update the current node 2020-10-10--17:02
+Update started at 2020-10-10--17:02
+Successful update  2020-10-10--17:02
+Current node version is up to date 2020-10-10--17:04
+Current node version is up to date 2020-10-11--01:50
+Current node version is up to date 2020-10-12--01:50
+Current node version is up to date 2020-10-13--01:50
+Current node version is up to date 2020-10-16--00:01
+Needs update the current node 2020-10-16--10:10
+Update started at 2020-10-16--10:10
+Current node version is up to date 2020-10-16--11:16
+Current node version is up to date 2020-10-17--01:50
+Current node version is up to date 2020-10-18--01:50
+Current node version is up to date 2020-10-19--11:44
+Needs update the current node 2020-10-19--11:45
+Update started at 2020-10-19--11:45
+cargo build -p neard --release
+cargo build -p keypair-generator --release
+cargo build -p genesis-csv-to-json --release
+cargo build -p near-vm-runner-standalone --release
+cargo build -p state-viewer --release
+cargo build -p store-validator --release
+Successful update  2020-10-19--12:50

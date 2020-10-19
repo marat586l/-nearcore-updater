@@ -3,36 +3,47 @@
 function update    {
 
  echo "Update started at `date +"%Y-%m-%d--%H:%M"`"
- echo "Update started at `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
+ echo "Update started at `date +"%Y-%m-%d--%H:%M"`" >> $DIR/update.log
+ if [ -n "${chatID}" ]; then                         #telegram bot ON   STR NOT EMPTY
+   "${DIR}/sendmess_111.sh" "$chatID" "Update started" 2>&1 > /dev/null
+ fi 
  rm -rf $HOMEFOLDER/nearcore.new
   
  git clone --branch $GH_version https://github.com/nearprotocol/nearcore.git $HOMEFOLDER/nearcore.new
- 
+  
  #git clone  https://github.com/nearprotocol/nearcore.git $HOMEFOLDER/nearcore.new
  #git checkout tags/$GH_version
  #git switch -c $GH_version
 
  cd $HOMEFOLDER/nearcore.new
- make release >> $HOMEFOLDER/update.log
+ make release >> $DIR/update.log
  
- if [ $? -eq 0 ]       #Successful update
- then
+ if [ $? -eq 0 ]; then      #Successful update
   rm -rf $HOMEFOLDER/nearcore.bak
   mv $HOMEFOLDER/nearcore $HOMEFOLDER/nearcore.bak
   mv  $HOMEFOLDER/nearcore.new $HOMEFOLDER/nearcore
  
   cd $HOMEFOLDER
-  echo "Successful update  `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
+  echo "Successful update  `date +"%Y-%m-%d--%H:%M"`" >> $DIR/update.log
   echo "Successful update  `date +"%Y-%m-%d--%H:%M"`" 
+  if [ -n "${chatID}" ]; then                         #telegram bot ON   STR NOT EMPTY
+   "${DIR}/sendmess_111.sh" "$chatID" "Successful update" 2>&1 > /dev/null
+  fi 
   nearup stop
   sleep 2
   nearup run ${network} --binary-path ~/nearcore/target/release/
  else
-  echo "Update is failed `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
+  echo "Update is failed `date +"%Y-%m-%d--%H:%M"`" >> $DIR/update.log
+  if [ -n "${chatID}" ]; then                         #telegram bot ON   STR NOT EMPTY
+     "${DIR}/sendmess_111.sh" "$chatID" "Update is failed" 2>&1 > /dev/null
+  fi 
  fi
 }
   
 #####################################################################################################
+
+ DIR=$(pwd -P)                   #get the DIR of script
+ #echo "DIR=  $DIR"
 
  if [[ "$USER" == "root" ]]; then
   HOMEFOLDER="/root"
@@ -42,6 +53,10 @@ function update    {
   s2="/home/"$USER
  fi
  
+ if [[ -e "config" ]]; then                #Check the telegram ON
+  chatID=$(cat config)
+ fi
+ 
  . $HOME/.profile                          # to make near CLI working in SystemD
                                            # to works in SYSTED for make release needs PATH="/home/marat/.cargo/bin:$PATH"
   str=$(cat $HOME/.cargo/env)              # get  export PATH="$HOME/.cargo/bin:$PATH"
@@ -49,12 +64,13 @@ function update    {
   ind1=$((`expr index "$str" "PATH"`-1))     #Index PATH
   ind2=$((`expr index "$str" "/"`-1))        #Index first /
   path=${str:$ind1:6}$s2${str:$ind2}       # get  PATH="/home/marat/.cargo/bin:$PATH"
-  echo "path=  $path"  
+  #echo "path=  $path"  
   eval $path 
 
-my_node=$(curl -s http://127.0.0.1:3030/status | jq .version | awk '{print $2}')   #My node version
-   ###my_node="1.16.0-beta.1"
-case ${my_node%,*} in         #choose my network
+  my_node=$(curl -s http://127.0.0.1:3030/status | jq .version | awk '{print $2}')   #My node version 
+###my_node="1.15.0-rc.1"
+
+ case ${my_node%,*} in         #choose my network
   
   *"$rc"*)
    # echo -n "TESTNET"
@@ -69,24 +85,34 @@ case ${my_node%,*} in         #choose my network
   *)
     network="main"            #???????                
     ;;
-esac
+ esac
 
-GH_version=$(curl -s https://rpc.${network}.near.org/status | jq .version | awk '{print $2}')  #Last version on GH
-echo "Current Node version is ${my_node%,*}"
-echo "Last version on GH is ${GH_version%,*}" 
+ GH_version=$(curl -s https://rpc.${network}.near.org/status | jq .version | awk '{print $2}')  #Last version on GH
+ echo "Current Node version is ${my_node%,*}"
+ echo "New version on GH is ${GH_version%,*}" 
 
-if [[ ${my_node%,*} == ${GH_version%,*} ]]
- then
-  echo "Version of the current Node is the last"
-  echo "Version of the current Node is the last `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
+ if [[ ${my_node%,*} == ${GH_version%,*} ]]; then
+  echo "Current node version is up to date"
+  echo "Current node version is up to date `date +"%Y-%m-%d--%H:%M"`" >> $DIR/update.log
+ # "${DIR}/sendmess_111.sh" "`date +"%Y-%m-%d--%H:%M"`'Current node version is up to date'" 2>&1 > /dev/null
+  if [ -n "${chatID}" ]; then                         #telegram bot ON   STR NOT EMPTY
+   "${DIR}/sendmess_111.sh" "$chatID" "Current node version is up to date" 2>&1 > /dev/null
+  fi 
  else
-   echo "Needs update the current Node"
-   echo "Needs update the current Node `date +"%Y-%m-%d--%H:%M"`" >> $HOMEFOLDER/update.log
+   echo "Needs update the current node"
+   echo "Needs update the current node `date +"%Y-%m-%d--%H:%M"`" >> $DIR/update.log
+   if [ -n "${chatID}" ]; then                         #telegram bot ON   STR NOT EMPTY
+     "${DIR}/sendmess_111.sh" "$chatID" "New version on GH. Needs update the current node" 2>&1 > /dev/null
+   fi
    if [ -z "$GH_version" ]; then
-    echo "Could't find the current Node version, may be not run, update continue"
+    echo "Could't determine the current Node version, may be not run `date +"%Y-%m-%d--%H:%M"`"
+    if [ -n "${chatID}" ]; then                         #telegram bot ON   STR NOT EMPTY
+     "${DIR}/sendmess_111.sh" "$chatID" "Could't determine the current Node version, may be not run" 2>&1 > /dev/null
+    fi 
+    exit
    fi 
    GH_version=$(echo ${GH_version%,*} | awk -F "\"" '{print $2}')
    
    update
-fi 
+ fi 
 
